@@ -1,28 +1,17 @@
-# .github/workflows/wordpress-vercel.yml
+# .github/workflows/wordpress-vercel-cli.yml
 name: WordPress to Vercel Deployment
 
 on:
   repository_dispatch:
     types: [wordpress-page-update, wordpress-page-delete]
-  workflow_dispatch: # Permite trigger manual
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check webhook payload
-        run: |
-          echo "📦 Webhook received from WordPress"
-          echo "📄 Page ID: ${{ github.event.client_payload.page_id }}"
-          echo "🏷️ Page Title: ${{ github.event.client_payload.page_title }}"
-          echo "🔧 Action: ${{ github.event.client_payload.action }}"
-          echo "🕐 Time: ${{ github.event.client_payload.updated_at || github.event.client_payload.deleted_at }}"
-
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,21 +24,16 @@ jobs:
 
       - name: Build project
         run: npm run build
-        env:
-          # Variáveis de ambiente para build, se necessário
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://nextjs-wordpress-webhook.vercel.app/' }}
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-args: '--prod' # Deploy em produção
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Notify success
         run: |
-          echo "✅ Deployment completed successfully!"
-          echo "🚀 Site deployed to Vercel"
-          echo "📝 Triggered by: ${{ github.event.client_payload.action }} of page '${{ github.event.client_payload.page_title }}'"
+          npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=deiv-code --yes
+        env:
+          VERCEL_ORG_ID: team_STtpM8TadUJm47oxyHrST0IX  # ⬅️ Use o team ID
+          VERCEL_PROJECT_ID: prj_qelEoJVFBqO5StdWJvjGghJ0yzHa
+
+      - name: Success message
+        run: echo "✅ Deploy realizado com sucesso!"
