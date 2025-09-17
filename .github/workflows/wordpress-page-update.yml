@@ -30,10 +30,11 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
-          npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=deiv-code --yes
-        env:
-          VERCEL_ORG_ID: team_STtpM8TadUJm47oxyHrST0IX  # ⬅️ Use o team ID
-          VERCEL_PROJECT_ID: prj_qelEoJVFBqO5StdWJvjGghJ0yzHa
+          # Primeiro verifica se o projeto existe
+          npx vercel link --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=deiv-code
+          
+          # Agora faz o deploy
+          npx vercel --yes --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=deiv-code
 
       - name: Success message
         run: echo "✅ Deploy realizado com sucesso!"
