@@ -27,11 +27,9 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
-          # Instala uma versão específica e estável do Vercel CLI
           npm install -g vercel@28.16.11
-          
-          # Deploy com confirmação automática
-          vercel --prod --token=$VERCEL_TOKEN --scope=deiv-code --confirm
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel --prod --token=$VERCEL_TOKEN --scope=deiv-code --confirm --yes --project nextjs-wordpress-webhook
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
