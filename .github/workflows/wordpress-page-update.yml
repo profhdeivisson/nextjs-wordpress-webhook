@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -25,16 +25,15 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
       - name: Deploy to Vercel
         run: |
-          # Primeiro verifica se o projeto existe
-          npx vercel link --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=deiv-code
+          # Instala uma versão específica e estável do Vercel CLI
+          npm install -g vercel@28.16.11
           
-          # Agora faz o deploy
-          npx vercel --yes --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=deiv-code
+          # Deploy com confirmação automática
+          vercel --prod --token=$VERCEL_TOKEN --scope=deiv-code --confirm
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Success message
         run: echo "✅ Deploy realizado com sucesso!"
